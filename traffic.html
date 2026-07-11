@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kavach-Edge | Smart Traffic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .vehicle-feed { overflow-y: auto; height: 100%; display: flex; flex-direction: column; gap: 10px; padding: 15px;}
+        .plate-card { background: rgba(0,0,0,0.5); padding: 15px; border-left: 4px solid var(--danger); border-radius: 6px; display: flex; justify-content: space-between; align-items: center;}
+        .plate-no { font-family: monospace; font-size: 1.2rem; font-weight: bold; color: var(--primary); letter-spacing: 2px;}
+        .cam-loc { font-size: 0.8rem; color: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header"><h2>KAVACH-EDGE</h2></div>
+            <nav class="sidebar-menu">
+                <a href="/" class="sidebar-link">🛡️ Core NOC</a>
+                <a href="/traffic" class="sidebar-link active">🚦 Smart Traffic</a>
+                <a href="/air-quality" class="sidebar-link">💨 Air Quality</a>
+                <a href="/ambulance" class="sidebar-link">🚑 Ambulance Tracker</a>
+                <a href="/agriculture" class="sidebar-link">🌾 Agri-Monitor</a>
+            </nav>
+        </aside>
+        <div class="app-container">
+            <header class="topbar">
+                <div class="brand">
+                    <span class="logo-icon">🚦</span>
+                    <div class="brand-text">
+                        <h1>SMART TRAFFIC & ANPR</h1>
+                        <span class="subtitle">Live Congestion & Unregistered Vehicle Tracking</span>
+                    </div>
+                </div>
+                <select id="city-select" class="city-select">
+                    <option value="28.6139,77.2090">Delhi NCR</option>
+                    <option value="19.0760,72.8777">Mumbai</option>
+                    <option value="12.9716,77.5946">Bangalore</option>
+                    <option value="13.0827,80.2707">Chennai</option>
+                    <option value="23.2599,77.4126">Bhopal</option>
+                </select>
+            </header>
+            <div class="main-grid" style="grid-template-columns: 2fr 1fr; height: 100%;">
+                <div class="panel map-panel" style="height: 100%;">
+                    <div class="panel-header"><h2>Live Traffic Flow</h2></div>
+                    <div id="map" style="flex: 1; border-radius: 0 0 12px 12px;"></div>
+                </div>
+                
+                <div class="panel" style="display: flex; flex-direction: column;">
+                    <div class="panel-header" style="border-bottom-color: var(--danger);">
+                        <h2><span style="color:var(--danger)">⚠️</span> Unregistered Vehicles (ANPR)</h2>
+                    </div>
+                    <div class="vehicle-feed" id="vehicle-feed">
+                        <!-- Feed items -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="/static/traffic.js"></script>
+</body>
+</html>

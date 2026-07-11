@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kavach-Edge | NOC Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>KAVACH-EDGE</h2>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="/" class="sidebar-link active">🛡️ Core NOC</a>
+                <a href="/traffic" class="sidebar-link">🚦 Smart Traffic</a>
+                <a href="/air-quality" class="sidebar-link">💨 Air Quality</a>
+                <a href="/ambulance" class="sidebar-link">🚑 Ambulance Tracker</a>
+                <a href="/agriculture" class="sidebar-link">🌾 Agri-Monitor</a>
+            </nav>
+        </aside>
+        <div class="app-container">
+        <!-- Top Navigation -->
+        <header class="topbar">
+            <div class="brand">
+                <span class="logo-icon">🛡️</span>
+                <div class="brand-text">
+                    <h1>KAVACH-EDGE</h1>
+                    <span class="subtitle">Edge-AI Threat & Anomaly Co-Pilot</span>
+                </div>
+            </div>
+            <div class="status-bar">
+                <div class="clock" id="clock">00:00:00</div>
+                <div class="connection-status">
+                    <span class="status-dot connected" id="connection-dot"></span>
+                    <span id="connection-text">Connected</span>
+                </div>
+                <button class="btn-primary" id="btn-view-ledger">View Ledger</button>
+            </div>
+        </header>
+        <!-- Stats Row -->
+        <section class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon">🌐</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="stat-total-nodes">0</div>
+                    <div class="stat-label">Total Nodes</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon success-icon">✅</div>
+                <div class="stat-info">
+                    <div class="stat-value text-success" id="stat-healthy-nodes">0</div>
+                    <div class="stat-label">Healthy Nodes</div>
+                </div>
+            </div>
+            <div class="stat-card impact-card">
+                <div class="stat-icon danger-icon">📉</div>
+                <div class="stat-info">
+                    <div class="stat-value text-danger" id="stat-loss">₹0</div>
+                    <div class="stat-label">Financial Loss | <span id="stat-citizens">0</span> Citizens Affected</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⛓️</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="stat-ledger">Valid</div>
+                    <div class="stat-label">Ledger Integrity</div>
+                </div>
+            </div>
+        </section>
+        <!-- Main Grid Layout -->
+        <main class="main-grid">
+            <!-- Left Column -->
+            <div class="col-left">
+                <!-- Map Container -->
+                <div class="panel map-panel">
+                    <div class="panel-header">
+                        <h2>Live GPS Infrastructure Map</h2>
+                    </div>
+                    <div id="map"></div>
+                </div>
+                <!-- Telemetry Chart Container -->
+                <div class="panel chart-panel">
+                    <div class="panel-header">
+                        <h2>Real-Time Telemetry: <span id="chart-node-name">None Selected</span></h2>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="telemetryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- Right Column -->
+            <div class="col-right">
+                <!-- Node Status Grid -->
+                <div class="panel node-list-panel">
+                    <div class="panel-header">
+                        <h2>Infrastructure Nodes</h2>
+                    </div>
+                    <div class="node-grid" id="node-grid">
+                        <!-- Node cards injected here -->
+                    </div>
+                </div>
+                <!-- Chaos Control Room -->
+                <div class="panel chaos-panel">
+                    <div class="panel-header">
+                        <h2>Chaos Control Room</h2>
+                        <span class="badge badge-warning">Simulation</span>
+                    </div>
+                    <div class="chaos-controls">
+                        <p class="target-label">Target: <span id="chaos-target-name">None Selected</span></p>
+                        <div class="toggle-grid">
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="chaos-toggle" data-attack="ddos">
+                                <span class="slider"></span>
+                                <span class="toggle-label">DDoS Attack</span>
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="chaos-toggle" data-attack="ransomware">
+                                <span class="slider"></span>
+                                <span class="toggle-label">Ransomware</span>
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="chaos-toggle" data-attack="sensor_spoofing">
+                                <span class="slider"></span>
+                                <span class="toggle-label">Sensor Spoofing</span>
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="chaos-toggle" data-attack="grid_failure">
+                                <span class="slider"></span>
+                                <span class="toggle-label">Grid Failure</span>
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="chaos-toggle" data-attack="data_exfiltration">
+                                <span class="slider"></span>
+                                <span class="toggle-label">Data Exfiltration</span>
+                            </label>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <button class="btn-sos" id="btn-sos-quarantine">🛡️ INITIATE CYBER SHIELD</button>
+                            <button class="btn-resolve" id="btn-resolve">RESTORE SYSTEM</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- Bottom Section -->
+        <section class="bottom-grid">
+            <!-- Alert Feed -->
+            <div class="panel alerts-panel">
+                <div class="panel-header">
+                    <h2>Live Anomaly Alerts</h2>
+                </div>
+                <div class="alert-feed" id="alert-feed">
+                    <!-- Alerts injected here -->
+                    <div class="empty-state">No alerts detected.</div>
+                </div>
+            </div>
+            <!-- AI Co-Pilot Panel -->
+            <div class="panel copilot-panel">
+                <div class="panel-header">
+                    <h2>AI Remediation Co-Pilot (SOP)</h2>
+                </div>
+                <div class="chat-container" id="chat-container">
+                    <div class="message ai-message">
+                        <div class="msg-avatar">🤖</div>
+                        <div class="msg-bubble">Hello. I am your Kavach-Edge offline AI Co-Pilot. I monitor alerts and provide automated Standard Operating Procedures (SOPs) for mitigation. How can I help?</div>
+                    </div>
+                    <!-- Chat messages injected here -->
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Ask for remediation SOP...">
+                    <button id="btn-send-chat">Send</button>
+                </div>
+            </div>
+        </section>
+    </div> <!-- End app-container -->
+    </div> <!-- End app-wrapper -->
+    <!-- Ledger Modal -->
+    <div class="modal-overlay" id="ledger-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cryptographic Audit Ledger</h2>
+                <div class="integrity-badge" id="ledger-integrity-badge">Verifying...</div>
+                <button class="btn-close" id="btn-close-modal">×</button>
+            </div>
+            <div class="modal-body receipt-body">
+                <div class="receipt-container" id="ledger-receipt">
+                    <div class="receipt-header">
+                        <h3>KAVACH-EDGE SECURE LEDGER</h3>
+                        <p>--- IMMUTABLE RECORD ---</p>
+                    </div>
+                    <div id="ledger-tbody">
+                        <!-- Ledger items injected here -->
+                    </div>
+                    <div class="receipt-footer">
+                        <p>*** END OF LEDGER ***</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Jarvis-Style Operations HUD -->
+    <div class="jarvis-hud" id="jarvis-hud">
+        <div class="hud-header">SYS-OPS HUD // KAVACH-AI</div>
+        <div class="hud-stat">
+            <span>STABILITY INDEX:</span>
+            <span id="hud-stability" class="hud-value hud-green">99.9%</span>
+        </div>
+        <div class="hud-stat">
+            <span>CRYPTO LEDGER:</span>
+            <span id="hud-ledger" class="hud-value hud-green">SECURE</span>
+        </div>
+        <div class="hud-stat">
+            <span>ACTIVE DEFENSES:</span>
+            <span id="hud-defenses" class="hud-value">STANDBY</span>
+        </div>
+    </div>
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/dashboard.js"></script>
+</body>
+</html>

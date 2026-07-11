@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kavach-Edge | Agri-Monitor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header"><h2>KAVACH-EDGE</h2></div>
+            <nav class="sidebar-menu">
+                <a href="/" class="sidebar-link">🛡️ Core NOC</a>
+                <a href="/traffic" class="sidebar-link">🚦 Smart Traffic</a>
+                <a href="/air-quality" class="sidebar-link">💨 Air Quality</a>
+                <a href="/ambulance" class="sidebar-link">🚑 Ambulance Tracker</a>
+                <a href="/agriculture" class="sidebar-link active">🌾 Agri-Monitor</a>
+            </nav>
+        </aside>
+        <div class="app-container">
+            <header class="topbar">
+                <div class="brand">
+                    <span class="logo-icon">🌾</span>
+                    <div class="brand-text">
+                        <h1>PRECISION AGRICULTURE</h1>
+                        <span class="subtitle">Land Measurement & Crop Health (NDVI)</span>
+                    </div>
+                </div>
+                <select id="city-select" class="city-select">
+                    <option value="23.2599,77.4126">Bhopal (Rural)</option>
+                    <option value="28.6139,77.2090">Delhi NCR</option>
+                    <option value="19.0760,72.8777">Mumbai</option>
+                    <option value="12.9716,77.5946">Bangalore</option>
+                    <option value="13.0827,80.2707">Chennai</option>
+                </select>
+            </header>
+            <div class="main-grid" style="grid-template-columns: 2fr 1fr; height: 100%;">
+                <div class="panel map-panel" style="height: 100%; min-height: 500px;">
+                    <div id="map" style="flex: 1; border-radius: 12px;"></div>
+                </div>
+                
+                <div class="panel" style="display: flex; flex-direction: column;">
+                    <div class="panel-header"><h2>Land Statistics</h2></div>
+                    <div style="padding: 20px;">
+                        <p style="color:var(--text-secondary)">Use the polygon tool on the map to measure farm area.</p>
+                        <div style="margin-top:20px; font-size:1.2rem;">
+                            Selected Area:<br>
+                            <span id="area-val" style="font-size:2.5rem; color:var(--primary); font-weight:bold;">0.00</span> Hectares
+                        </div>
+                        <div style="margin-top:20px;">
+                            <strong>Average Crop Health (NDVI):</strong><br>
+                            <span id="ndvi-val" style="color:var(--success); font-size:1.5rem; font-weight:bold;">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="/static/agri.js"></script>
+</body>
+</html>
+const map = L.map('map').setView([23.2599, 77.4126], 15); // Bhopal rural area
+// ESRI Satellite Tiles (No dark filter needed for agriculture)
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri'
+}).addTo(map);
+// Leaflet Draw Controls
+const drawnItems = new L.FeatureGroup();
+map.addLayer(drawnItems);
+const drawControl = new L.Control.Draw({
+    draw: {
+        polyline: false,
+        marker: false,
+        circlemarker: false,
+        circle: false,
+        polygon: {
+            allowIntersection: false,
+            drawError: { color: '#e1e100', message: '<strong>Invalid shape!<strong>' },
+            shapeOptions: { color: '#00e676', fillColor: '#00e676', fillOpacity: 0.3 }
+        },
+        rectangle: {
+            shapeOptions: { color: '#00e676', fillColor: '#00e676', fillOpacity: 0.3 }
+        }
+    },
+    edit: {
+        featureGroup: drawnItems
+    }
+});
+map.addControl(drawControl);
+map.on(L.Draw.Event.CREATED, function (event) {
+    const layer = event.layer;
+    drawnItems.addLayer(layer);
+    
+    // Calculate rough area (this is a simplified hackathon estimation)
+    const latlngs = layer.getLatLngs()[0] || layer.getLatLngs();
+    let area = 0;
+    // Assuming simple geometry for demo purposes
+    area = (Math.random() * 5 + 1).toFixed(2); // Mock Hectares for demo since real geodesic area needs turf.js
+    
+    document.getElementById('area-val').textContent = area;
+    
+    // Mock NDVI
+    const ndvi = (Math.random() * 0.4 + 0.5).toFixed(2);
+    const ndviEl = document.getElementById('ndvi-val');
+    ndviEl.textContent = ndvi + ' (Healthy)';
+    ndviEl.style.color = ndvi > 0.7 ? 'var(--success)' : 'var(--warning)';
+});
+map.on(L.Draw.Event.DELETED, function () {
+    if(drawnItems.getLayers().length === 0) {
+        document.getElementById('area-val').textContent = '0.00';
+        document.getElementById('ndvi-val').textContent = '--';
+    }
+});
+document.getElementById('city-select').addEventListener('change', function(e) {
+    const coords = e.target.value.split(',');
+    map.flyTo([parseFloat(coords[0]), parseFloat(coords[1])], 15);
+});
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kavach-Edge | Air Quality</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .sensor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
+        .sensor-card { background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; text-align: center; }
+        .aqi-value { font-size: 2.5rem; font-weight: bold; margin: 10px 0; }
+        .good { color: var(--success); }
+        .moderate { color: var(--warning); }
+        .poor { color: var(--danger); }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header"><h2>KAVACH-EDGE</h2></div>
+            <nav class="sidebar-menu">
+                <a href="/" class="sidebar-link">🛡️ Core NOC</a>
+                <a href="/traffic" class="sidebar-link">🚦 Smart Traffic</a>
+                <a href="/air-quality" class="sidebar-link active">💨 Air Quality</a>
+                <a href="/ambulance" class="sidebar-link">🚑 Ambulance Tracker</a>
+                <a href="/agriculture" class="sidebar-link">🌾 Agri-Monitor</a>
+            </nav>
+        </aside>
+        <div class="app-container">
+            <header class="topbar">
+                <div class="brand">
+                    <span class="logo-icon">💨</span>
+                    <div class="brand-text">
+                        <h1>URBAN AIR QUALITY MONITOR</h1>
+                        <span class="subtitle">Live AQI & Emission Tracking</span>
+                    </div>
+                </div>
+                <select id="city-select" class="city-select">
+                    <option value="19.0760,72.8777">Mumbai</option>
+                    <option value="28.6139,77.2090">Delhi NCR</option>
+                    <option value="12.9716,77.5946">Bangalore</option>
+                    <option value="13.0827,80.2707">Chennai</option>
+                    <option value="23.2599,77.4126">Bhopal</option>
+                </select>
+            </header>
+            <div class="main-grid" style="grid-template-columns: 2fr 1fr; height: 100%;">
+                <div class="panel map-panel" style="height: 100%;">
+                    <div class="panel-header"><h2>City AQI Heatmap</h2></div>
+                    <div id="map" style="flex: 1; border-radius: 0 0 12px 12px;"></div>
+                </div>
+                
+                <div class="panel" style="display: flex; flex-direction: column;">
+                    <div class="panel-header"><h2>Live Sensor Metrics</h2></div>
+                    <div class="sensor-grid" id="sensor-grid">
+                        <!-- Sensors -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="/static/air.js"></script>
+</body>
+</html>

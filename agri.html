@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kavach-Edge | Agri-Monitor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header"><h2>KAVACH-EDGE</h2></div>
+            <nav class="sidebar-menu">
+                <a href="/" class="sidebar-link">🛡️ Core NOC</a>
+                <a href="/traffic" class="sidebar-link">🚦 Smart Traffic</a>
+                <a href="/air-quality" class="sidebar-link">💨 Air Quality</a>
+                <a href="/ambulance" class="sidebar-link">🚑 Ambulance Tracker</a>
+                <a href="/agriculture" class="sidebar-link active">🌾 Agri-Monitor</a>
+            </nav>
+        </aside>
+        <div class="app-container">
+            <header class="topbar">
+                <div class="brand">
+                    <span class="logo-icon">🌾</span>
+                    <div class="brand-text">
+                        <h1>PRECISION AGRICULTURE</h1>
+                        <span class="subtitle">Land Measurement & Crop Health (NDVI)</span>
+                    </div>
+                </div>
+                <select id="city-select" class="city-select">
+                    <option value="23.2599,77.4126">Bhopal (Rural)</option>
+                    <option value="28.6139,77.2090">Delhi NCR</option>
+                    <option value="19.0760,72.8777">Mumbai</option>
+                    <option value="12.9716,77.5946">Bangalore</option>
+                    <option value="13.0827,80.2707">Chennai</option>
+                </select>
+            </header>
+            <div class="main-grid" style="grid-template-columns: 2fr 1fr; height: 100%;">
+                <div class="panel map-panel" style="height: 100%; min-height: 500px;">
+                    <div id="map" style="flex: 1; border-radius: 12px;"></div>
+                </div>
+                
+                <div class="panel" style="display: flex; flex-direction: column;">
+                    <div class="panel-header"><h2>Land Statistics</h2></div>
+                    <div style="padding: 20px;">
+                        <p style="color:var(--text-secondary)">Use the polygon tool on the map to measure farm area.</p>
+                        <div style="margin-top:20px; font-size:1.2rem;">
+                            Selected Area:<br>
+                            <span id="area-val" style="font-size:2.5rem; color:var(--primary); font-weight:bold;">0.00</span> Hectares
+                        </div>
+                        <div style="margin-top:20px;">
+                            <strong>Average Crop Health (NDVI):</strong><br>
+                            <span id="ndvi-val" style="color:var(--success); font-size:1.5rem; font-weight:bold;">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="/static/agri.js"></script>
+</body>
+</html>
